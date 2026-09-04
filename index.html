@@ -7,105 +7,334 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    background: #0f0f0f; color: #fff;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100vh; display: flex;
-    align-items: center; justify-content: center;
+    background: var(--tg-theme-bg-color, #0f0f0f);
+    color: var(--tg-theme-text-color, #fff);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
-  .card {
-    background: #1a1a1a; border: 1px solid #2a2a2a;
-    border-radius: 20px; padding: 40px 30px;
-    max-width: 360px; width: 90%; text-align: center;
+
+  /* ── VERIFY SCREEN ── */
+  .screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    max-width: 380px;
+    width: 100%;
+    animation: fadeIn 0.4s ease;
   }
-  .icon { font-size: 56px; margin-bottom: 20px; }
-  h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-  .sub { color: #888; font-size: 13px; margin-bottom: 20px; }
-  .sep { height: 1px; background: #2a2a2a; margin: 16px 0; }
-  .feature { display: flex; align-items: center; gap: 12px;
-    padding: 7px 0; font-size: 14px; color: #aaa; text-align: left; }
-  .feature span { font-size: 20px; }
+  .screen.hidden {
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .shield-wrap {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 28px;
+  }
+  .shield-bg {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px;
+    box-shadow: 0 0 40px rgba(124, 58, 237, 0.4);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 30px rgba(124,58,237,0.4); }
+    50%       { box-shadow: 0 0 60px rgba(124,58,237,0.7); }
+  }
+
+  h1 {
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .sub {
+    font-size: 13px;
+    color: var(--tg-theme-hint-color, #888);
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    max-width: 280px;
+  }
+
+  .features {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 8px 0;
+    margin-bottom: 28px;
+  }
+  .feat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 18px;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color, #aaa);
+  }
+  .feat .icon { font-size: 20px; flex-shrink: 0; }
+  .feat-sep {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 0 18px;
+  }
+
   .btn {
-    margin-top: 24px; width: 100%; padding: 16px;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    color: white; border: none; border-radius: 14px;
-    font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+    box-shadow: 0 4px 24px rgba(124,58,237,0.35);
   }
-  .btn:active { opacity: 0.8; }
-  .btn:disabled { background: #333; cursor: not-allowed; }
-  .status { margin-top: 14px; font-size: 13px; color: #666; min-height: 18px; }
+  .btn:active  { transform: scale(0.97); opacity: 0.9; }
+  .btn:disabled {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.3);
+    cursor: default;
+    box-shadow: none;
+  }
+
+  .status-txt {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--tg-theme-hint-color, #666);
+    text-align: center;
+    min-height: 18px;
+    transition: opacity 0.3s;
+  }
+
+  /* ── SUCCESS SCREEN ── */
+  #successScreen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+  }
+
+  .checkmark-wrap {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .checkmark-circle {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    box-shadow: 0 0 50px rgba(16,185,129,0.5);
+  }
+  @keyframes successPop {
+    0%   { transform: scale(0); opacity: 0; }
+    60%  { transform: scale(1.12); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .checkmark-icon {
+    font-size: 46px;
+    animation: checkFade 0.3s 0.3s ease forwards;
+    opacity: 0;
+  }
+  @keyframes checkFade {
+    to { opacity: 1; }
+  }
+
+  .success-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    animation: fadeSlide 0.4s 0.4s ease forwards;
+    opacity: 0;
+  }
+  .success-sub {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color, #888);
+    margin-bottom: 24px;
+    line-height: 1.5;
+    animation: fadeSlide 0.4s 0.5s ease forwards;
+    opacity: 0;
+    max-width: 260px;
+  }
+  .close-bar {
+    width: 100%;
+    max-width: 320px;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    animation: fadeSlide 0.3s 0.6s ease forwards;
+    opacity: 0;
+  }
+  .close-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #059669);
+    border-radius: 4px;
+    width: 0%;
+    animation: fillBar 1.8s 0.7s linear forwards;
+  }
+  @keyframes fillBar {
+    to { width: 100%; }
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .close-label {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--tg-theme-hint-color, #666);
+    animation: fadeSlide 0.3s 0.7s ease forwards;
+    opacity: 0;
+  }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="icon">🔐</div>
-  <h1>DEVICE VERIFICATION</h1>
-  <p class="sub">Verify your device to continue</p>
-  <div class="sep"></div>
-  <div class="feature"><span>⚡</span> Earn points via referrals</div>
-  <div class="feature"><span>🛡️</span> One account per device</div>
-  <div class="feature"><span>🌐</span> Unlock full bot access</div>
-  <div class="sep"></div>
-  <button class="btn" id="btn" onclick="verify()">🔐 Verify My Device</button>
-  <div class="status" id="status"></div>
+
+<!-- VERIFY SCREEN -->
+<div class="screen" id="verifyScreen">
+  <div class="shield-wrap">
+    <div class="shield-bg">🔐</div>
+  </div>
+  <h1>Device Verification</h1>
+  <p class="sub">Tap below to verify your device and unlock full bot access.</p>
+  <div class="features">
+    <div class="feat">
+      <span class="icon">⚡</span>
+      <span>Earn points via referrals</span>
+    </div>
+    <div class="feat-sep"></div>
+    <div class="feat">
+      <span class="icon">🛡️</span>
+      <span>One account per device only</span>
+    </div>
+    <div class="feat-sep"></div>
+    <div class="feat">
+      <span class="icon">🌐</span>
+      <span>Unlock full bot access</span>
+    </div>
+  </div>
+  <button class="btn" id="verifyBtn" onclick="verify()">🔐 Verify My Device</button>
+  <div class="status-txt" id="statusTxt"></div>
 </div>
+
+<!-- SUCCESS SCREEN (hidden initially) -->
+<div class="screen hidden" id="successScreen">
+  <div class="checkmark-wrap">
+    <div class="checkmark-circle">
+      <span class="checkmark-icon">✓</span>
+    </div>
+  </div>
+  <div class="success-title">Verified!</div>
+  <div class="success-sub">Your device is verified. Returning to bot…</div>
+  <div class="close-bar">
+    <div class="close-fill"></div>
+  </div>
+  <div class="close-label">Closing automatically…</div>
+</div>
+
 <script>
-const tg = window.Telegram.WebApp;
-tg.ready(); tg.expand();
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
 
-async function getFingerprint() {
-  let canvas = "";
-  try {
-    const c = document.createElement("canvas");
-    const ctx = c.getContext("2d");
-    ctx.font = "14px Arial";
-    ctx.fillText("fp🔐", 2, 2);
-    canvas = c.toDataURL().slice(-40);
-  } catch(e) {}
+  async function getFingerprint() {
+    let canvas = "";
+    try {
+      const c   = document.createElement("canvas");
+      const ctx = c.getContext("2d");
+      ctx.font  = "14px Arial";
+      ctx.fillText("fp🔐", 2, 15);
+      canvas = c.toDataURL().slice(-40);
+    } catch (e) {}
 
-  let webgl = "";
-  try {
-    const gl = document.createElement("canvas").getContext("webgl");
-    const d = gl.getExtension("WEBGL_debug_renderer_info");
-    webgl = gl.getParameter(d.UNMASKED_RENDERER_WEBGL);
-  } catch(e) {}
+    let webgl = "";
+    try {
+      const gl = document.createElement("canvas").getContext("webgl");
+      const d  = gl.getExtension("WEBGL_debug_renderer_info");
+      webgl    = gl.getParameter(d.UNMASKED_RENDERER_WEBGL);
+    } catch (e) {}
 
-  const raw = [
-    navigator.userAgent,
-    navigator.language,
-    navigator.hardwareConcurrency || "",
-    navigator.deviceMemory || "",
-    screen.width + "x" + screen.height,
-    screen.colorDepth,
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-    canvas, webgl
-  ].join("|");
+    const raw = [
+      navigator.userAgent,
+      navigator.language,
+      navigator.hardwareConcurrency  || "",
+      navigator.deviceMemory         || "",
+      screen.width + "x" + screen.height,
+      screen.colorDepth,
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      canvas,
+      webgl
+    ].join("|");
 
-  let hash = 0;
-  for (let i = 0; i < raw.length; i++) {
-    hash = ((hash << 5) - hash) + raw.charCodeAt(i);
-    hash |= 0;
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash).toString(16).padStart(8, "0");
   }
-  return Math.abs(hash).toString(16).padStart(8, "0");
-}
 
-async function verify() {
-  const btn = document.getElementById("btn");
-  const status = document.getElementById("status");
-  btn.disabled = true;
-  btn.textContent = "🔄 Verifying...";
-  status.textContent = "Collecting fingerprint...";
-  try {
-    const fp = await getFingerprint();
-    tg.sendData(JSON.stringify({ action: "device_verify", fingerprint: fp }));
-    btn.textContent = "✅ Verified!";
-    status.textContent = "Go back to bot.";
-  } catch(e) {
-    status.textContent = "Error: " + e.message;
-    btn.disabled = false;
-    btn.textContent = "🔐 Retry";
+  function showSuccess() {
+    document.getElementById("verifyScreen").classList.add("hidden");
+    const s = document.getElementById("successScreen");
+    s.classList.remove("hidden");
+    // Auto-close after fill bar completes (0.7s delay + 1.8s fill = 2.5s)
+    setTimeout(() => {
+      tg.close();
+    }, 2600);
   }
-}
+
+  async function verify() {
+    const btn    = document.getElementById("verifyBtn");
+    const status = document.getElementById("statusTxt");
+
+    btn.disabled     = true;
+    btn.textContent  = "🔄 Verifying…";
+    status.textContent = "Reading device fingerprint…";
+
+    try {
+      const fp = await getFingerprint();
+
+      tg.sendData(JSON.stringify({
+        action:      "device_verify",
+        fingerprint: fp
+      }));
+
+      // Small delay so sendData goes through, then show success
+      setTimeout(showSuccess, 300);
+
+    } catch (e) {
+      status.textContent  = "Error: " + e.message;
+      btn.disabled        = false;
+      btn.textContent     = "🔐 Retry";
+    }
+  }
 </script>
 </body>
 </html>
