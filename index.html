@@ -38,11 +38,9 @@
       gap: 0;
     }
 
-    /* ── SCREENS ── */
     .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
     .screen.active { display: flex; }
 
-    /* ── ICON SHIELD ── */
     .shield-wrap {
       position: relative;
       width: 110px;
@@ -80,7 +78,6 @@
       animation: none;
     }
 
-    /* ── TITLE ── */
     .title {
       font-size: 22px;
       font-weight: 700;
@@ -98,7 +95,6 @@
       padding: 0 8px;
     }
 
-    /* ── PROGRESS CARD ── */
     .progress-card {
       width: 100%;
       background: var(--tg-secondary);
@@ -160,7 +156,6 @@
       100% { transform: scale(1); }
     }
 
-    /* ── BUTTON ── */
     .btn {
       width: 100%;
       padding: 16px;
@@ -180,7 +175,6 @@
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
 
-    /* ── INFO BADGES ── */
     .badge-row {
       display: flex;
       gap: 8px;
@@ -200,7 +194,6 @@
       gap: 5px;
     }
 
-    /* ── DETAIL LIST ── */
     .detail-list {
       width: 100%;
       background: var(--tg-secondary);
@@ -222,7 +215,6 @@
     .detail-label { color: var(--tg-hint); }
     .detail-value { color: var(--tg-text); font-weight: 500; font-family: monospace; font-size: 12px; }
 
-    /* ── SUCCESS ── */
     .success-id {
       font-family: monospace;
       font-size: 13px;
@@ -236,7 +228,6 @@
       letter-spacing: 1px;
     }
 
-    /* ── ERROR BOX ── */
     .error-box {
       width: 100%;
       background: rgba(239,68,68,0.12);
@@ -250,7 +241,6 @@
       text-align: center;
     }
 
-    /* ── ANTI-BOT WARNING ── */
     .warn-box {
       width: 100%;
       background: rgba(245,158,11,0.12);
@@ -264,7 +254,6 @@
       line-height: 1.5;
     }
 
-    /* ── FOOTER ── */
     .footer-note {
       font-size: 11px;
       color: var(--tg-hint);
@@ -274,7 +263,6 @@
       line-height: 1.5;
     }
 
-    /* ── FADE ANIM ── */
     .fade-in { animation: fadeIn 0.4s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
   </style>
@@ -282,7 +270,7 @@
 <body>
 <div class="container">
 
-  <!-- ═══ SCREEN 1: INTRO ═══ -->
+  <!-- SCREEN 1: INTRO -->
   <div class="screen active fade-in" id="screen-intro">
     <div class="shield-wrap">
       <div class="shield-bg">🛡️</div>
@@ -309,7 +297,7 @@
     </div>
   </div>
 
-  <!-- ═══ SCREEN 2: SCANNING ═══ -->
+  <!-- SCREEN 2: SCANNING -->
   <div class="screen" id="screen-scan">
     <div class="shield-wrap">
       <div class="shield-bg" id="scan-icon">🔍</div>
@@ -333,19 +321,18 @@
     <div class="footer-note">Please wait, do not close this window…</div>
   </div>
 
-  <!-- ═══ SCREEN 3: SUCCESS ═══ -->
+  <!-- SCREEN 3: SUCCESS -->
   <div class="screen" id="screen-success">
     <div class="shield-wrap">
       <div class="shield-bg success fade-in">✅</div>
     </div>
     <div class="title fade-in">Device Verified!</div>
-    <div class="subtitle fade-in">Your device has been successfully registered.<br>You can now access all bot features.</div>
+    <div class="subtitle fade-in">Your device has been successfully registered.<br>Returning to bot…</div>
     <div class="success-id fade-in" id="success-id-display"></div>
-    <button class="btn fade-in" onclick="closeMiniApp()">🚀 Continue to Bot</button>
     <div class="footer-note">This window will close automatically.</div>
   </div>
 
-  <!-- ═══ SCREEN 4: BLOCKED ═══ -->
+  <!-- SCREEN 4: BLOCKED -->
   <div class="screen" id="screen-blocked">
     <div class="shield-wrap">
       <div class="shield-bg error fade-in">🚫</div>
@@ -355,12 +342,11 @@
       This device is already linked to another Telegram account.<br><br>
       Only <strong>one account per device</strong> is allowed.
     </div>
-    <div class="detail-list fade-in" id="block-details"></div>
     <button class="btn danger fade-in" onclick="closeMiniApp()">❌ Close</button>
     <div class="footer-note">Contact support if you believe this is an error.</div>
   </div>
 
-  <!-- ═══ SCREEN 5: ERROR ═══ -->
+  <!-- SCREEN 5: ERROR -->
   <div class="screen" id="screen-error">
     <div class="shield-wrap">
       <div class="shield-bg error fade-in">⚠️</div>
@@ -374,18 +360,13 @@
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════════
-//  TELEGRAM MINI APP INIT
-// ══════════════════════════════════════════════════════════════
-
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 tg.disableVerticalSwipes?.();
+if (tg.MainButton) tg.MainButton.hide();
 
-// ══════════════════════════════════════════════════════════════
-//  SCREEN MANAGEMENT
-// ══════════════════════════════════════════════════════════════
+// ── SCREEN MANAGEMENT ──────────────────────────────────────────
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -393,9 +374,7 @@ function showScreen(id) {
   if (el) { el.classList.add('active'); el.classList.add('fade-in'); }
 }
 
-// ══════════════════════════════════════════════════════════════
-//  STEP PROGRESS
-// ══════════════════════════════════════════════════════════════
+// ── STEP PROGRESS ──────────────────────────────────────────────
 
 const STEPS = ['browser','screen','canvas','webgl','audio','fonts','hash'];
 let currentStep = 0;
@@ -421,9 +400,7 @@ function markStepDone(name) {
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// ══════════════════════════════════════════════════════════════
-//  FINGERPRINT COLLECTORS
-// ══════════════════════════════════════════════════════════════
+// ── FINGERPRINT COLLECTORS ─────────────────────────────────────
 
 function getBrowserSignals() {
   const nav = window.navigator;
@@ -474,7 +451,6 @@ function getCanvasFingerprint() {
     canvas.height = 60;
     const ctx = canvas.getContext('2d');
     if (!ctx) return 'no-canvas';
-
     ctx.textBaseline = 'top';
     ctx.font = '14px Arial';
     ctx.fillStyle = '#f60';
@@ -483,8 +459,6 @@ function getCanvasFingerprint() {
     ctx.fillText('DeviceVerify🛡️', 2, 15);
     ctx.fillStyle = 'rgba(102,204,0,0.7)';
     ctx.fillText('DeviceVerify🛡️', 4, 17);
-
-    // Gradient arc
     const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
     grad.addColorStop(0, '#ff6b6b');
     grad.addColorStop(1, '#6c63ff');
@@ -493,8 +467,7 @@ function getCanvasFingerprint() {
     ctx.beginPath();
     ctx.arc(50, 40, 18, 0, Math.PI * 2);
     ctx.stroke();
-
-    return canvas.toDataURL().substring(22, 150); // partial hash slice
+    return canvas.toDataURL().substring(22, 150);
   } catch (e) { return 'canvas-err'; }
 }
 
@@ -503,7 +476,7 @@ function getWebGLSignals() {
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     if (!gl) return 'no-webgl';
-    const dbgInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    const dbgInfo  = gl.getExtension('WEBGL_debug_renderer_info');
     const vendor   = dbgInfo ? gl.getParameter(dbgInfo.UNMASKED_VENDOR_WEBGL)   : (gl.getParameter(gl.VENDOR)   || '');
     const renderer = dbgInfo ? gl.getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL) : (gl.getParameter(gl.RENDERER) || '');
     const version  = gl.getParameter(gl.VERSION) || '';
@@ -516,32 +489,28 @@ async function getAudioSignature() {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return 'no-audio';
-    const ctx    = new AudioCtx();
-    const osc    = ctx.createOscillator();
-    const analyser = ctx.createAnalyser();
-    const gain   = ctx.createGain();
+    const ctx             = new AudioCtx();
+    const osc             = ctx.createOscillator();
+    const analyser        = ctx.createAnalyser();
+    const gain            = ctx.createGain();
     const scriptProcessor = ctx.createScriptProcessor(4096, 1, 1);
-
-    gain.gain.value = 0; // silent
+    gain.gain.value = 0;
     osc.connect(analyser);
     analyser.connect(scriptProcessor);
     scriptProcessor.connect(gain);
     gain.connect(ctx.destination);
-
     osc.start(0);
     await delay(100);
     const freqData = new Float32Array(analyser.frequencyBinCount);
     analyser.getFloatFrequencyData(freqData);
     osc.stop();
     ctx.close();
-
     const sum = freqData.slice(0, 30).reduce((a, b) => a + b, 0);
     return String(Math.abs(sum).toFixed(6));
   } catch (e) { return 'audio-' + (e.message || 'err').substring(0, 10); }
 }
 
 function getFontSignals() {
-  // Probe for font presence by measuring text width
   const testFonts = [
     'Arial','Courier New','Georgia','Times New Roman','Verdana',
     'Helvetica','Impact','Trebuchet MS','Comic Sans MS','Palatino',
@@ -551,9 +520,8 @@ function getFontSignals() {
   const canvas = document.createElement('canvas');
   const ctx    = canvas.getContext('2d');
   if (!ctx) return 'no-font-ctx';
-  const base = '72px monospace';
-  ctx.font    = base;
-  const baseW = ctx.measureText('mmmmmmmmmmlli').width;
+  ctx.font     = '72px monospace';
+  const baseW  = ctx.measureText('mmmmmmmmmmlli').width;
   const present = [];
   for (const font of testFonts) {
     ctx.font = `72px '${font}', monospace`;
@@ -563,7 +531,6 @@ function getFontSignals() {
 }
 
 function getStorageSignals() {
-  // Detect storage availability — incognito often has limited quota
   const results = [];
   try { localStorage.setItem('_fptest', '1'); localStorage.removeItem('_fptest'); results.push('ls:ok'); }
   catch (e) { results.push('ls:no'); }
@@ -578,7 +545,7 @@ function getStorageSignals() {
 
 function getPluginSignals() {
   try {
-    const plugins = Array.from(navigator.plugins || []).map(p => p.name).join(',');
+    const plugins   = Array.from(navigator.plugins  || []).map(p => p.name).join(',');
     const mimeTypes = Array.from(navigator.mimeTypes || []).map(m => m.type).join(',');
     return (plugins + '||' + mimeTypes).substring(0, 200);
   } catch (e) { return 'plugin-err'; }
@@ -590,107 +557,81 @@ function getNetworkSignals() {
   return [c.effectiveType || '', c.type || '', String(c.downlink || ''), String(c.rtt || '')].join('|');
 }
 
-// ══════════════════════════════════════════════════════════════
-//  SHA-256 HASH (WebCrypto)
-// ══════════════════════════════════════════════════════════════
+// ── SHA-256 ────────────────────────────────────────────────────
 
 async function sha256(message) {
-  const msgBuffer = new TextEncoder().encode(message);
+  const msgBuffer  = new TextEncoder().encode(message);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashArray  = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// ══════════════════════════════════════════════════════════════
-//  ANTI-BYPASS DETECTION
-// ══════════════════════════════════════════════════════════════
+// ── ANTI-BYPASS ────────────────────────────────────────────────
 
 function detectBypassSignals() {
   const flags = [];
-
-  // Headless / automation
   if (navigator.webdriver) flags.push('webdriver');
   if (window._phantom || window.callPhantom) flags.push('phantom');
   if (window.__nightmare) flags.push('nightmare');
   if (navigator.userAgent.toLowerCase().includes('headless')) flags.push('headless-ua');
   if (typeof window.chrome === 'undefined' && navigator.userAgent.includes('Chrome')) flags.push('fake-chrome');
-
-  // Incognito detection heuristics
-  // In incognito, some APIs behave differently
   try {
     const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
     if (!fs) flags.push('no-fs');
   } catch (e) {}
-
-  // Check for common proxy/VPN indicators (basic)
   if (navigator.languages && navigator.languages.length === 0) flags.push('no-languages');
   if (!navigator.cookieEnabled) flags.push('cookies-off');
-
-  // Spoofed screen — some bots set unusual values
   if (screen.width === 0 || screen.height === 0) flags.push('zero-screen');
   if (screen.colorDepth < 16) flags.push('low-colordepth');
-
-  // Plugin anomalies (headless browsers have zero plugins)
   if (navigator.plugins.length === 0 && !/(Mobile|Android|iPhone)/i.test(navigator.userAgent)) {
     flags.push('no-plugins-desktop');
   }
-
   return flags;
 }
 
-// ══════════════════════════════════════════════════════════════
-//  MAIN FINGERPRINT BUILDER
-// ══════════════════════════════════════════════════════════════
+// ── FINGERPRINT BUILDER ────────────────────────────────────────
 
 async function collectFingerprint() {
   const collected = {};
   const bypass    = detectBypassSignals();
 
-  // Step 1: Browser
   markStepDoing('browser');
   await delay(350);
-  collected.browser   = getBrowserSignals();
-  collected.timezone  = getTimezoneSignals();
-  collected.storage   = getStorageSignals();
-  collected.plugins   = getPluginSignals();
-  collected.network   = getNetworkSignals();
-  collected.bypass    = bypass.join(',');
+  collected.browser  = getBrowserSignals();
+  collected.timezone = getTimezoneSignals();
+  collected.storage  = getStorageSignals();
+  collected.plugins  = getPluginSignals();
+  collected.network  = getNetworkSignals();
+  collected.bypass   = bypass.join(',');
   markStepDone('browser');
 
-  // Step 2: Screen
   markStepDoing('screen');
   await delay(300);
   collected.screen = getScreenSignals();
   markStepDone('screen');
 
-  // Step 3: Canvas
   markStepDoing('canvas');
   await delay(400);
   collected.canvas = getCanvasFingerprint();
   markStepDone('canvas');
 
-  // Step 4: WebGL
   markStepDoing('webgl');
   await delay(350);
   collected.webgl = getWebGLSignals();
   markStepDone('webgl');
 
-  // Step 5: Audio
   markStepDoing('audio');
   collected.audio = await getAudioSignature();
   markStepDone('audio');
 
-  // Step 6: Fonts
   markStepDoing('fonts');
   await delay(400);
   collected.fonts = getFontSignals();
   markStepDone('fonts');
 
-  // Step 7: Hash
   markStepDoing('hash');
   await delay(300);
 
-  // Build composite fingerprint string — ordered for determinism
   const rawFP = [
     collected.browser,
     collected.screen,
@@ -709,17 +650,15 @@ async function collectFingerprint() {
   return { fingerprint, bypass, rawComponents: collected };
 }
 
-// ══════════════════════════════════════════════════════════════
-//  ENTRY POINTS
-// ══════════════════════════════════════════════════════════════
+// ── MAIN ENTRY ─────────────────────────────────────────────────
 
 async function startVerification() {
   document.getElementById('btn-start').disabled = true;
   showScreen('scan');
   currentStep = 0;
 
-  let fp = null;
-  let bypass = [];
+  let fp         = null;
+  let bypass     = [];
   let components = {};
 
   try {
@@ -734,26 +673,28 @@ async function startVerification() {
     return;
   }
 
-  // Send to Telegram bot backend
   try {
     const payload = JSON.stringify({
-      action:      'device_verify',
-      fingerprint: fp,
+      action:       'device_verify',
+      fingerprint:  fp,
       bypass_flags: (bypass || []).join(','),
-      ua:          navigator.userAgent.substring(0, 100),
-      screen:      screen.width + 'x' + screen.height,
-      tz:          Intl.DateTimeFormat().resolvedOptions().timeZone,
-      ts:          Date.now(),
+      ua:           navigator.userAgent.substring(0, 100),
+      screen:       screen.width + 'x' + screen.height,
+      tz:           Intl.DateTimeFormat().resolvedOptions().timeZone,
+      ts:           Date.now(),
     });
 
+    // ── FIX: send data FIRST, then show success, then close ──
     tg.sendData(payload);
 
-    // Show success screen (backend will validate; we trust Telegram channel security)
     document.getElementById('success-id-display').textContent =
       '🔑 Device ID: ' + fp.substring(0, 16).toUpperCase() + '…';
+
     showScreen('success');
 
-    setTimeout(() => { tg.close(); }, 3000);
+    // FIX: 1500ms gives bot enough time to process before WebApp closes
+    // so Telegram chat refreshes properly and shows the next bot message
+    setTimeout(() => { tg.close(); }, 1500);
 
   } catch (err) {
     showScreen('error');
@@ -777,9 +718,6 @@ function retryVerification() {
 }
 
 function closeMiniApp() { tg.close(); }
-
-// Auto-init
-tg.MainButton && tg.MainButton.hide();
 </script>
 </body>
 </html>
