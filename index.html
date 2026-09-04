@@ -1,88 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Device Verification</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #1a1a2e;
-      color: white;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      text-align: center;
-    }
-    .icon { font-size: 64px; margin-bottom: 20px; }
-    h1 { font-size: 24px; font-weight: 700; margin-bottom: 10px; color: #4fc3f7; }
-    p { font-size: 14px; color: #b0bec5; margin-bottom: 30px; line-height: 1.6; }
-    .features {
-      background: #16213e;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 30px;
-      width: 100%;
-      max-width: 320px;
-    }
-    .feature {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 8px 0;
-      font-size: 14px;
-      text-align: left;
-    }
-    .btn {
-      background: linear-gradient(135deg, #4fc3f7, #1976d2);
-      color: white;
-      border: none;
-      padding: 16px 40px;
-      border-radius: 50px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      max-width: 320px;
-      letter-spacing: 0.5px;
-    }
-    .btn:active { opacity: 0.85; transform: scale(0.98); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Device Verification</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f0f; color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .card {
+    background: #1a1a1a; border: 1px solid #2a2a2a;
+    border-radius: 20px; padding: 40px 30px;
+    max-width: 360px; width: 90%; text-align: center;
+  }
+  .icon { font-size: 56px; margin-bottom: 20px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .sub { color: #888; font-size: 13px; margin-bottom: 20px; }
+  .sep { height: 1px; background: #2a2a2a; margin: 16px 0; }
+  .feature { display: flex; align-items: center; gap: 12px;
+    padding: 7px 0; font-size: 14px; color: #aaa; text-align: left; }
+  .feature span { font-size: 20px; }
+  .btn {
+    margin-top: 24px; width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white; border: none; border-radius: 14px;
+    font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn:active { opacity: 0.8; }
+  .btn:disabled { background: #333; cursor: not-allowed; }
+  .status { margin-top: 14px; font-size: 13px; color: #666; min-height: 18px; }
+</style>
 </head>
 <body>
+<div class="card">
   <div class="icon">🔐</div>
   <h1>DEVICE VERIFICATION</h1>
-  <p>Apna device verify karo aage badhne ke liye</p>
+  <p class="sub">Verify your device to continue</p>
+  <div class="sep"></div>
+  <div class="feature"><span>⚡</span> Earn points via referrals</div>
+  <div class="feature"><span>🛡️</span> One account per device</div>
+  <div class="feature"><span>🌐</span> Unlock full bot access</div>
+  <div class="sep"></div>
+  <button class="btn" id="btn" onclick="verify()">🔐 Verify My Device</button>
+  <div class="status" id="status"></div>
+</div>
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready(); tg.expand();
 
-  <div class="features">
-    <div class="feature"><span>⚡</span><span>Points milenge referral se</span></div>
-    <div class="feature"><span>🛡️</span><span>Sirf ek account per device</span></div>
-    <div class="feature"><span>🌐</span><span>Bot access unlock hoga</span></div>
-  </div>
+async function getFingerprint() {
+  let canvas = "";
+  try {
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    ctx.font = "14px Arial";
+    ctx.fillText("fp🔐", 2, 2);
+    canvas = c.toDataURL().slice(-40);
+  } catch(e) {}
 
-  <button class="btn" onclick="verify()">🔐 Verify My Device</button>
+  let webgl = "";
+  try {
+    const gl = document.createElement("canvas").getContext("webgl");
+    const d = gl.getExtension("WEBGL_debug_renderer_info");
+    webgl = gl.getParameter(d.UNMASKED_RENDERER_WEBGL);
+  } catch(e) {}
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+  const raw = [
+    navigator.userAgent,
+    navigator.language,
+    navigator.hardwareConcurrency || "",
+    navigator.deviceMemory || "",
+    screen.width + "x" + screen.height,
+    screen.colorDepth,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    canvas, webgl
+  ].join("|");
 
-    function verify() {
-      // initData bhejo back to bot
-      tg.sendData(JSON.stringify({
-        action: "device_verified",
-        user_id: tg.initDataUnsafe?.user?.id,
-        username: tg.initDataUnsafe?.user?.username || "",
-        first_name: tg.initDataUnsafe?.user?.first_name || "",
-        language_code: tg.initDataUnsafe?.user?.language_code || "",
-        is_premium: tg.initDataUnsafe?.user?.is_premium || false,
-      }));
-    }
-  </script>
+  let hash = 0;
+  for (let i = 0; i < raw.length; i++) {
+    hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).padStart(8, "0");
+}
+
+async function verify() {
+  const btn = document.getElementById("btn");
+  const status = document.getElementById("status");
+  btn.disabled = true;
+  btn.textContent = "🔄 Verifying...";
+  status.textContent = "Collecting fingerprint...";
+  try {
+    const fp = await getFingerprint();
+    tg.sendData(JSON.stringify({ action: "device_verify", fingerprint: fp }));
+    btn.textContent = "✅ Verified!";
+    status.textContent = "Go back to bot.";
+  } catch(e) {
+    status.textContent = "Error: " + e.message;
+    btn.disabled = false;
+    btn.textContent = "🔐 Retry";
+  }
+}
+</script>
 </body>
 </html>
